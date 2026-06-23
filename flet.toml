@@ -1,3 +1,5 @@
 name = "super_ai_agent"
+product = "Super AI Agent"
 description = "My Super AI Agent"
 version = "1.0.0"
+org = "com.ai"
