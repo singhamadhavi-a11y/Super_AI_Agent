@@ -1,13 +1,9 @@
 import flet as ft
-from openai import OpenAI
+import urllib.request
+import json
 
 # তোমার পার্সোনাল চাবি
 api_key = "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"
-
-client = OpenAI(
-    base_url="https://openrouter.ai/api/v1",
-    api_key=api_key,
-)
 
 def main(page: ft.Page):
     # প্রো-লেভেল অ্যাপ ডিজাইন
@@ -59,13 +55,23 @@ def main(page: ft.Page):
         loading_ring.visible = True
         page.update()
 
-        # এআই-এর ম্যাজিক উত্তর আনা
+        # এআই-এর ম্যাজিক উত্তর আনা (পুরোপুরি পাইথনের নিজস্ব নিয়মে)
         try:
-            response = client.chat.completions.create(
-                model="meta-llama/llama-3-8b-instruct:free",
-                messages=[{"role": "user", "content": user_text}]
-            )
-            ai_reply = response.choices[0].message.content
+            url = "https://openrouter.ai/api/v1/chat/completions"
+            data = {
+                "model": "meta-llama/llama-3-8b-instruct:free",
+                "messages": [{"role": "user", "content": user_text}]
+            }
+            headers = {
+                "Authorization": f"Bearer {api_key}",
+                "Content-Type": "application/json"
+            }
+            
+            req = urllib.request.Request(url, data=json.dumps(data).encode("utf-8"), headers=headers, method="POST")
+            
+            with urllib.request.urlopen(req) as response:
+                result = json.loads(response.read().decode("utf-8"))
+                ai_reply = result["choices"][0]["message"]["content"]
             
             # এআই-এর মেসেজ
             chat_history.controls.append(
@@ -100,4 +106,4 @@ def main(page: ft.Page):
     )
 
 ft.app(target=main)
-            
+    
