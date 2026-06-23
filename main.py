@@ -1,4 +1,4 @@
-            import flet as ft
+import flet as ft
 from openai import OpenAI
 
 # তোমার পার্সোনাল চাবি
@@ -17,7 +17,6 @@ def main(page: ft.Page):
     page.window_width = 400
     page.window_height = 800
 
-    # 🟢 অ্যাপের হেডলাইন (এই লাইনটাই আমরা ঠিক জায়গায় বসালাম)
     page.appbar = ft.AppBar(
         title=ft.Text("Super AI Agent 🚀", weight=ft.FontWeight.BOLD, color=ft.colors.WHITE), 
         bgcolor=ft.colors.BLUE_GREY_900,
@@ -93,7 +92,7 @@ def main(page: ft.Page):
         on_click=send_click
     )
     
-    # 🟢 এখানে শুধু চ্যাটবক্স আর বোতাম থাকবে, কোনো AppBar নয়
+    # স্ক্রিনের সব কিছু সাজানো
     page.add(
         chat_history,
         ft.Row([loading_ring], alignment=ft.MainAxisAlignment.CENTER),
@@ -101,4 +100,4 @@ def main(page: ft.Page):
     )
 
 ft.app(target=main)
-        
+            
