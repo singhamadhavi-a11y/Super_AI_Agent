@@ -1,7 +1,7 @@
-import flet as ft
+            import flet as ft
 from openai import OpenAI
 
-# তোমার পার্সোনাল চাবি সরাসরি অ্যাপের ভেতরে দেওয়া হলো
+# তোমার পার্সোনাল চাবি
 api_key = "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"
 
 client = OpenAI(
@@ -16,6 +16,13 @@ def main(page: ft.Page):
     page.bgcolor = ft.colors.GREY_900
     page.window_width = 400
     page.window_height = 800
+
+    # 🟢 অ্যাপের হেডলাইন (এই লাইনটাই আমরা ঠিক জায়গায় বসালাম)
+    page.appbar = ft.AppBar(
+        title=ft.Text("Super AI Agent 🚀", weight=ft.FontWeight.BOLD, color=ft.colors.WHITE), 
+        bgcolor=ft.colors.BLUE_GREY_900,
+        center_title=True
+    )
 
     # চ্যাট লিস্ট (অটো স্ক্রোল হবে)
     chat_history = ft.ListView(expand=True, spacing=15, auto_scroll=True)
@@ -39,7 +46,7 @@ def main(page: ft.Page):
         user_text = user_input.value
         user_input.value = ""
         
-        # ইউজারের মেসেজ (ডানদিকে নীল বক্সে)
+        # ইউজারের মেসেজ
         chat_history.controls.append(
             ft.Container(
                 content=ft.Text(f"অংশু: {user_text}", color=ft.colors.WHITE, size=16),
@@ -61,7 +68,7 @@ def main(page: ft.Page):
             )
             ai_reply = response.choices[0].message.content
             
-            # এআই-এর মেসেজ (বাঁ-দিকে সবুজ বক্সে)
+            # এআই-এর মেসেজ
             chat_history.controls.append(
                 ft.Container(
                     content=ft.Text(f"এআই: {ai_reply}", color=ft.colors.BLACK, size=16),
@@ -86,17 +93,12 @@ def main(page: ft.Page):
         on_click=send_click
     )
     
-    # স্ক্রিনের ওপরের হেডলাইন এবং সব কিছু সাজানো
+    # 🟢 এখানে শুধু চ্যাটবক্স আর বোতাম থাকবে, কোনো AppBar নয়
     page.add(
-        ft.AppBar(
-            title=ft.Text("Super AI Agent 🚀", weight=ft.FontWeight.BOLD, color=ft.colors.WHITE), 
-            bgcolor=ft.colors.BLUE_GREY_900,
-            center_title=True
-        ),
         chat_history,
         ft.Row([loading_ring], alignment=ft.MainAxisAlignment.CENTER),
         ft.Row([user_input, send_btn], alignment=ft.MainAxisAlignment.SPACE_BETWEEN)
     )
 
 ft.app(target=main)
-    
+        
