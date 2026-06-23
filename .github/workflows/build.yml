@@ -33,7 +33,7 @@ jobs:
         run: pip install flet openai
 
       - name: Build APK File
-        run: flet build apk
+        run: yes "y" | flet build apk
 
       - name: Upload Mobile App
         uses: actions/upload-artifact@v4
