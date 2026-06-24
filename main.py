@@ -6,12 +6,11 @@ import json
 api_key = "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"
 
 def main(page: ft.Page):
-    # জেমিনির মতো লাইট থিম ও ফুল স্ক্রিন
     page.theme_mode = ft.ThemeMode.LIGHT
     page.padding = 0
     page.bgcolor = ft.colors.WHITE
     
-    # ওপরের হেডলাইন
+    # 🟢 ওপরের হেডলাইন
     top_bar = ft.Container(
         content=ft.Row([
             ft.IconButton(ft.icons.MENU, icon_color=ft.colors.BLACK87),
@@ -21,7 +20,6 @@ def main(page: ft.Page):
         padding=ft.padding.only(top=15, left=10, right=15, bottom=5)
     )
     
-    # চ্যাটের জায়গা
     chat_history = ft.ListView(expand=True, spacing=20, auto_scroll=True, padding=20)
     
     greeting_text = ft.Text("", size=32, weight=ft.FontWeight.W_400, color=ft.colors.BLUE_GREY_700)
@@ -51,7 +49,6 @@ def main(page: ft.Page):
         user_text = user_input.value
         user_input.value = ""
         
-        # প্রথম মেসেজ পাঠালে ওয়েলকাম লেখাটা সরিয়ে দেবে
         if welcome_box in chat_history.controls:
             chat_history.controls.remove(welcome_box)
         
@@ -72,7 +69,6 @@ def main(page: ft.Page):
         loading_ring.visible = True
         page.update()
         
-        # এআই-এর উত্তর আনা
         try:
             url = "https://openrouter.ai/api/v1/chat/completions"
             data = {
@@ -125,47 +121,41 @@ def main(page: ft.Page):
         bgcolor=ft.colors.WHITE
     )
 
-    # 🟢 এই ম্যাজিক কলামটাই মোবাইল স্ক্রিনকে সাদা হওয়া থেকে বাঁচাবে
-    main_layout = ft.Column(
+    chat_layout = ft.Column(
         expand=True,
-        controls=[
-            top_bar,
-            chat_history,
-            input_area
-        ]
+        visible=False,
+        controls=[top_bar, chat_history, input_area]
     )
-    
-    page.add(main_layout)
 
-    # ==========================================
-    # প্রফেশনাল মেমোরি সিস্টেম (Pop-up Box)
-    # ==========================================
-    name_input_field = ft.TextField(label="Your Name", hint_text="Enter your name...")
+    # 🟢 ফিক্সড ওয়েলকাম লগইন স্ক্রিন (এটার জন্যই ফোন হ্যাং করবে না)
+    name_field = ft.TextField(hint_text="Enter your name...", width=250, border_radius=20, text_align=ft.TextAlign.CENTER)
     
-    def save_name_click(e):
-        if name_input_field.value:
-            page.client_storage.set("user_name", name_input_field.value)
-            greeting_text.value = f"Hi {name_input_field.value}"
-            name_dialog.open = False
+    def start_app_click(e):
+        if name_field.value:
+            user_name = name_field.value
+            welcome_layout.visible = False
+            chat_layout.visible = True
+            
+            greeting_text.value = f"Hi {user_name}"
             page.update()
 
-    name_dialog = ft.AlertDialog(
-        title=ft.Text("Welcome to AI Agent!"),
-        content=name_input_field,
-        actions=[ft.TextButton("Start", on_click=save_name_click)],
-        modal=True
+    start_button = ft.ElevatedButton("Start Chat", on_click=start_app_click, bgcolor=ft.colors.BLUE_600, color=ft.colors.WHITE)
+
+    welcome_layout = ft.Column(
+        expand=True,
+        alignment=ft.MainAxisAlignment.CENTER,
+        horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+        controls=[
+            ft.Icon(ft.icons.AUTO_AWESOME, size=80, color=ft.colors.BLUE_400),
+            ft.Text("Welcome to Super AI", size=24, weight=ft.FontWeight.BOLD),
+            ft.Container(height=20),
+            name_field,
+            start_button
+        ]
     )
-    
-    page.dialog = name_dialog
 
-    # চেক করা হচ্ছে ইউজারের নাম আগে থেকে সেভ করা আছে কি না
-    saved_name = page.client_storage.get("user_name")
-    if saved_name:
-        greeting_text.value = f"Hi {saved_name}"
-    else:
-        name_dialog.open = True
-        
-    page.update()
+    page.add(welcome_layout, chat_layout)
 
+# 🟢 পিওর মোবাইল অ্যাপের কমান্ড
 ft.app(target=main)
     
