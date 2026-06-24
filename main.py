@@ -6,12 +6,12 @@ import json
 api_key = "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"
 
 def main(page: ft.Page):
-    # জেমিনির মতো লাইট থিম
+    # জেমিনির মতো লাইট থিম ও ফুল স্ক্রিন
     page.theme_mode = ft.ThemeMode.LIGHT
     page.padding = 0
     page.bgcolor = ft.colors.WHITE
     
-    # 🟢 ওপরের হেডলাইন
+    # ওপরের হেডলাইন
     top_bar = ft.Container(
         content=ft.Row([
             ft.IconButton(ft.icons.MENU, icon_color=ft.colors.BLACK87),
@@ -21,9 +21,9 @@ def main(page: ft.Page):
         padding=ft.padding.only(top=15, left=10, right=15, bottom=5)
     )
     
+    # চ্যাটের জায়গা
     chat_history = ft.ListView(expand=True, spacing=20, auto_scroll=True, padding=20)
     
-    # 🟢 নাম দেখানোর জায়গাটা শুরুতে ফাঁকা রাখা হলো
     greeting_text = ft.Text("", size=32, weight=ft.FontWeight.W_400, color=ft.colors.BLUE_GREY_700)
     
     welcome_box = ft.Column([
@@ -72,7 +72,7 @@ def main(page: ft.Page):
         loading_ring.visible = True
         page.update()
         
-        # ইন্টারনেট থেকে এআই-এর উত্তর আনা
+        # এআই-এর উত্তর আনা
         try:
             url = "https://openrouter.ai/api/v1/chat/completions"
             data = {
@@ -124,19 +124,31 @@ def main(page: ft.Page):
         padding=ft.padding.only(left=5, right=5, bottom=10, top=5),
         bgcolor=ft.colors.WHITE
     )
+
+    # 🟢 এই ম্যাজিক কলামটাই মোবাইল স্ক্রিনকে সাদা হওয়া থেকে বাঁচাবে
+    main_layout = ft.Column(
+        expand=True,
+        controls=[
+            top_bar,
+            chat_history,
+            input_area
+        ]
+    )
     
+    page.add(main_layout)
+
     # ==========================================
-    # 🟢 প্রফেশনাল মেমোরি সিস্টেম (Pop-up Box)
+    # প্রফেশনাল মেমোরি সিস্টেম (Pop-up Box)
     # ==========================================
+    name_input_field = ft.TextField(label="Your Name", hint_text="Enter your name...")
+    
     def save_name_click(e):
         if name_input_field.value:
-            # ইউজারের নামটা আজীবনের জন্য মোবাইলে সেভ করে নিল
             page.client_storage.set("user_name", name_input_field.value)
             greeting_text.value = f"Hi {name_input_field.value}"
             name_dialog.open = False
             page.update()
 
-    name_input_field = ft.TextField(label="Your Name", hint_text="Enter your name...")
     name_dialog = ft.AlertDialog(
         title=ft.Text("Welcome to AI Agent!"),
         content=name_input_field,
@@ -144,16 +156,13 @@ def main(page: ft.Page):
         modal=True
     )
     
-    page.add(top_bar, chat_history, input_area)
+    page.dialog = name_dialog
 
-    # অ্যাপ খোলার পর চেক করা হচ্ছে ইউজারের নাম আগে থেকে সেভ করা আছে কি না
+    # চেক করা হচ্ছে ইউজারের নাম আগে থেকে সেভ করা আছে কি না
     saved_name = page.client_storage.get("user_name")
     if saved_name:
-        # নাম সেভ থাকলে সরাসরি নাম দেখাবে
         greeting_text.value = f"Hi {saved_name}"
     else:
-        # নাম সেভ না থাকলে প্রথমবার নাম জিজ্ঞেস করবে
-        page.dialog = name_dialog
         name_dialog.open = True
         
     page.update()
